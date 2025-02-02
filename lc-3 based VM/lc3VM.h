@@ -1,6 +1,14 @@
 #pragma once
+#include <iostream>
+#include <stdint.h>
+#include <signal.h>
+/* windows only */
+#include <Windows.h>
+#include <conio.h>  // _kbhit
+
 
 #define MEMORY_MAX (1 << 16)
+#define PC_START 0x3000
 
 enum //register indexes in register file
 {
@@ -62,3 +70,47 @@ enum // all the errors
     BAD_OPCODE = 1,
 
 };
+
+
+
+class lc3VM
+{
+public:
+
+    lc3VM();
+    ~lc3VM();
+	uint16_t* memory; //literal memory (stored in an array)
+	uint16_t* reg; //registers- every reg is just an 16 bit unsigend int (regs are r0-8, cp, flags) in list
+	//stack??
+
+	
+	int ADD(uint16_t instruction);
+	int AND(uint16_t instruction);
+	int NOT(uint16_t instruction);
+	int BR(uint16_t instruction);
+	int JMP(uint16_t instruction);
+	int JSR(uint16_t instruction);
+	int LD(uint16_t instruction);
+	int LDI(uint16_t instruction);
+	int LDR(uint16_t instruction);
+	int LEA(uint16_t instruction);
+	int ST(uint16_t instruction);
+	int STI(uint16_t instruction);
+	int STR(uint16_t instruction);
+	int TRAP(uint16_t instruction);
+	int RES(uint16_t instruction); //maybe switch these 2 to psh and pop from stack
+	int RTI(uint16_t instruction);
+
+
+	void errorHasAcurred(int code)
+	{
+		std::cout << "error happend! at line " << mem_read(reg[R_PC]) << " with error code " << code << std::endl;
+		exit(1);
+	}
+
+	uint16_t mem_read(uint16_t address);
+    void mem_write(uint16_t address, uint16_t val);
+    uint16_t sign_extend(uint16_t x, int bit_count);
+    void update_flags(uint16_t r);
+};
+
